@@ -134,6 +134,8 @@
             timeoutDOM: 500
         };
 
+        this.v = "0.4.1";
+
     };
 
     NOP.prototype = Object.create(nopEventProvider.prototype);
@@ -597,22 +599,6 @@
         }
 
     }
-
-    /*
-    NOP.prototype._filters = {
-        noFalsy: function(item ) {
-            if (!item) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    };
-    NOP.prototype.registerFilter = function(name, filter) {
-        var self = this;
-        if (_w.isFunction(filter)) { self._filters[name] = filter; }
-    }
-    */
 
     NOP.prototype.updateRepeats = function(selector) {
 
