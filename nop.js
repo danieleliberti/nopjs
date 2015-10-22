@@ -557,8 +557,10 @@
     // **DOM METHODS: GET - SET REPEATS**
     //
     //
+
     NOP.prototype.registerRepeats = function() {
 
+        // Register repeats
         var self = this;
         var selector = "[" + tagPrefix + "-repeat]";
         self._repeats = self._repeats || {};
@@ -566,7 +568,6 @@
 
         var elements = n.dom(selector).get();
         for (var i in elements) {
-
             var element = elements[i],
                 options = self.dom(element).getOptions();
 
@@ -575,22 +576,18 @@
             var wrapperAttr = tagPrefix + "-repeat-wrapper=\"" + self._repeatsCount + "\"",
                 parent = n.dom(element).parent("[" + wrapperAttr + "]");
             if (!parent.length) {
-
                 self._repeats[options.repeat].push({
                     id: self._repeatsCount,
                     element: n.dom(element).clone(true).removeAttr(tagPrefix + "-repeat").removeAttr(tagPrefix + "-filter").get(0),
                     selector: options.repeat,
                     filter: options.filter
                 });
-
-                var wrapper = document.createElement("div");
-                n.dom(wrapper).attr(tagPrefix + "-repeat-wrapper", self._repeatsCount);
-                n.dom(wrapper).attr(tagPrefix + "-scope", options.repeat);
+                n.dom(n.dom(element).parent()).attr(tagPrefix + "-repeat-wrapper", self._repeatsCount);
+                n.dom(n.dom(element).parent()).attr(tagPrefix + "-scope", options.repeat);
                 if (options.filter) {
-                    n.dom(wrapper).attr(tagPrefix + "-filter", options.filter);
+                    n.dom(n.dom(element).parent()).attr(tagPrefix + "-filter", options.filter);
                 }
 
-                n.dom(element).replaceWith(wrapper);
                 self.updateRepeats(options.repeat);
 
                 self._repeatsCount++;
@@ -600,6 +597,22 @@
         }
 
     }
+
+    /*
+    NOP.prototype._filters = {
+        noFalsy: function(item ) {
+            if (!item) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    };
+    NOP.prototype.registerFilter = function(name, filter) {
+        var self = this;
+        if (_w.isFunction(filter)) { self._filters[name] = filter; }
+    }
+    */
 
     NOP.prototype.updateRepeats = function(selector) {
 
@@ -619,14 +632,17 @@
 
             for (var key in data) {
 
+
                 n.dom(repeat.element).attr(tagPrefix + "-scope", key);
                 var html = n.dom(repeat.element).get(0).outerHTML;
-                html = html.replace(/\$\$key/gi, key);
+                var m = html.match(/\$\$(key|{[^\}]+})/gi);
+                html = html.replace(m, eval(RegExp.$1));
                 items.push(html);
 
             }
 
             n.dom(wrapper).html(items.join(""));
+            setEventListeners(wrapper);
             self.registerBindings();
             self.updateBindings();
 
